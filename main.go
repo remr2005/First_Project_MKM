@@ -54,9 +54,8 @@ func main() {
 		return
 	}
 	p.Add(line)
-
 	// Сохраняем график в файл
-	if err := p.Save(400*vg.Points(1), 400*vg.Points(1), "plot.png"); err != nil {
+	if err := p.Save(500*vg.Points(1), 500*vg.Points(1), "plot.png"); err != nil {
 		fmt.Println("Ошибка сохранения:", err)
 	}
 }
