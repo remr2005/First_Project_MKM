@@ -32,7 +32,7 @@ func Loop(v0, vM, dt, alpha, x, y float64, ch chan plotter.XYs) {
 		}
 		points = append(points, plotter.XY{X: r.AtVec(0), Y: r.AtVec(1)})
 		ch <- points
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 	}
 	close(ch)
 }
