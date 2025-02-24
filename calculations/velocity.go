@@ -22,5 +22,5 @@ func Velocity_Fix(v, a0, a1 *mat.VecDense, t float64) *mat.VecDense {
 }
 
 func MakeVelocity(alpha, v float64) *mat.VecDense {
-	return mat.NewVecDense(2, []float64{v * math.Cos(alpha), v * math.Sin(alpha)})
+	return mat.NewVecDense(2, []float64{v * math.Cos(alpha*math.Pi/180), v * math.Sin(alpha*math.Pi/180)})
 }
