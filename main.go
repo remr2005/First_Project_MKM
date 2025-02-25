@@ -9,7 +9,7 @@ import (
 
 func main() {
 	game := &game.Game{}
-	ebiten.SetWindowSize(640, 480)
+	ebiten.SetWindowSize(1080, 720)
 	ebiten.SetWindowTitle("График с динамическим добавлением точек")
 
 	if err := ebiten.RunGame(game); err != nil {

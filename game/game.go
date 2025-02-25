@@ -27,19 +27,6 @@ const (
 
 var stepSizes = []float32{10, 20, 50, 100, 200, 500, 1000, 2000}
 
-func findBounds(points []struct{ X, Y float32 }) (maxX, maxY float32) {
-	maxX, maxY = 0, 0
-	for _, p := range points {
-		if p.X > maxX {
-			maxX = p.X
-		}
-		if p.Y > maxY {
-			maxY = p.Y
-		}
-	}
-	return maxX, maxY
-}
-
 func chooseStep(rangeVal float32) float32 {
 	for _, step := range stepSizes {
 		if rangeVal/step <= 10 {
@@ -65,6 +52,10 @@ func (g *Game) Update() error {
 		mx, my := ebiten.CursorPosition()
 		// Проверка, находится ли клик в области кнопки "Старт"
 		if mx >= screenWidth-120 && mx <= screenWidth-20 && my >= 20 && my <= 50 {
+			points = append(points, struct {
+				X float32
+				Y float32
+			}{x, y})
 			g.isRunning = true
 			g.v = calculations.MakeVelocity(alpha, v0)
 			g.a = mat.NewVecDense(2, nil) // nil → нулевые значения
@@ -82,13 +73,18 @@ func (g *Game) Update() error {
 		if g.r.AtVec(1) < 0 {
 			g.isRunning = false
 		}
+		if g.r.AtVec(0) > float64(g.maxX) {
+			g.maxX = float32(g.r.AtVec(0))
+		}
+		if g.r.AtVec(1) > float64(g.maxY) {
+			g.maxY = float32(g.r.AtVec(1))
+		}
 	}
 
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.maxX, g.maxY = findBounds(points)
 	g.stepX = chooseStep(g.maxX)
 	g.stepY = chooseStep(g.maxY)
 	g.scaleX = (screenWidth - 2*padding) / g.maxX
