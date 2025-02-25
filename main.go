@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	game := &game.Game{}
-	ebiten.SetWindowSize(1080, 720)
+	game := game.NewGame()
+	ebiten.SetWindowSize(1440, 720)
 	ebiten.SetWindowTitle("График с динамическим добавлением точек")
 
 	if err := ebiten.RunGame(game); err != nil {
