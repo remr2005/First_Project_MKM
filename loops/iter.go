@@ -9,31 +9,10 @@ import (
 )
 
 func Iter(r, v, a *mat.VecDense, dt, vM float64) {
-	// Вычисляем новое положение
-	rNew := mat.NewVecDense(2, nil)
-	temp := mat.NewVecDense(2, nil)
-
-	temp.ScaleVec(dt, v) // v * dt
-	rNew.AddVec(r, temp)
-
-	temp.ScaleVec(0.5*dt*dt, a) // 0.5 * a * dt^2
-	rNew.AddVec(rNew, temp)
-
-	// Вычисляем предсказанную скорость
-	vPred := mat.NewVecDense(2, nil)
-	temp.ScaleVec(dt, a) // a * dt
-	vPred.AddVec(v, temp)
-
-	// Вычисляем новое ускорение
+	r.CopyVec(calculations.Coordinate(r, v, a, dt))
+	vPred := calculations.Velocity(v, a, dt)
 	aNew := calculations.Acceleration(vPred, vM)
-
-	// Обновляем скорость
-	temp.AddVec(a, aNew)
-	temp.ScaleVec(0.5*dt, temp) // 0.5 * (a + aNew) * dt
-	v.AddVec(v, temp)
-
-	// Обновляем положение и ускорение
-	r.CopyVec(rNew)
+	v.CopyVec(calculations.Velocity_Fix(v, a, aNew, dt))
 	a.CopyVec(aNew)
 }
 
