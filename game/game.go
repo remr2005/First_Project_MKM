@@ -81,10 +81,7 @@ func (g *Game) Update() error {
 			X float32
 			Y float32
 		}{g.timer * dt, float32(g.v.Norm(2))})
-		// fmt.Println(g.timer, g.v.Norm(2)*g.v.Norm(2)/2+calculations.G_Scl()*g.r.AtVec(1))
-		fmt.Println(g.timer, g.a)
-		fmt.Println(g.timer, g.v)
-		fmt.Println(g.timer, g.r)
+		fmt.Println("Полная энергия равна", g.timer, g.v.Norm(2)*g.v.Norm(2)/2+calculations.G_Scl()*g.r.AtVec(1))
 		g.timer += 1
 	}
 
