@@ -9,12 +9,32 @@ import (
 )
 
 func Iter(r, v, a *mat.VecDense, dt, vM float64) {
-	r.CopyVec(calculations.Coordinate(r, v, a, dt)) // Копируем новые координаты в r
-	a0 := mat.NewVecDense(2, nil)
-	a0.CopyVec(a) // Сохраняем текущее ускорение
-	v.CopyVec(calculations.Velocity(v, a0, dt))
-	a.CopyVec(calculations.Nul_Acceleration(v, r.AtVec(1), vM))
-	v.CopyVec(calculations.Velocity_Fix(v, a0, a, dt))
+	// Вычисляем новое положение
+	rNew := mat.NewVecDense(2, nil)
+	temp := mat.NewVecDense(2, nil)
+
+	temp.ScaleVec(dt, v) // v * dt
+	rNew.AddVec(r, temp)
+
+	temp.ScaleVec(0.5*dt*dt, a) // 0.5 * a * dt^2
+	rNew.AddVec(rNew, temp)
+
+	// Вычисляем предсказанную скорость
+	vPred := mat.NewVecDense(2, nil)
+	temp.ScaleVec(dt, a) // a * dt
+	vPred.AddVec(v, temp)
+
+	// Вычисляем новое ускорение
+	aNew := calculations.Acceleration(vPred, vM)
+
+	// Обновляем скорость
+	temp.AddVec(a, aNew)
+	temp.ScaleVec(0.5*dt, temp) // 0.5 * (a + aNew) * dt
+	v.AddVec(v, temp)
+
+	// Обновляем положение и ускорение
+	r.CopyVec(rNew)
+	a.CopyVec(aNew)
 }
 
 func Loop(v0, vM, dt, alpha, x, y float64, ch chan plotter.XYs) {

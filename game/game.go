@@ -1,9 +1,11 @@
 package game
 
 import (
+	"fmt"
 	"image/color"
 	"main/calculations"
 	"main/loops"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -20,8 +22,8 @@ const (
 	v0    = 750
 	x     = 0
 	y     = 0
-	dt    = 0.2
-	vM    = 150
+	dt    = 1
+	vM    = 999999999999
 )
 
 type Game struct {
@@ -54,15 +56,23 @@ func (g *Game) Update() error {
 				Y float32
 			}{x, y})
 			g.isRunning = true
-			g.v = calculations.MakeVelocity(alpha, v0)
-			g.a = mat.NewVecDense(2, nil) // nil → нулевые значения
 			g.r = mat.NewVecDense(2, []float64{x, y})
+			g.v = calculations.MakeVelocity(alpha, v0)
+			g.a = calculations.G_Vec()
+			// g.a = mat.NewVecDense(2, []float64{0, 0})
+			// g.a = calculations.Nul_Acceleration(g.v, g.r.AtVec(1), vM)
+			// g.a = calculations.Acceleration(g.v, vM)
 		}
+		time.Sleep(200 * time.Millisecond)
 	}
 
 	// Если процесс вычислений активен
 	if g.isRunning {
 		loops.Iter(g.r, g.v, g.a, dt, vM)
+		if g.r.AtVec(1) < 0 {
+			g.isRunning = false
+			g.r = mat.NewVecDense(2, []float64{g.r.AtVec(0), 0})
+		}
 		g.g1.points = append(g.g1.points, struct {
 			X float32
 			Y float32
@@ -71,9 +81,10 @@ func (g *Game) Update() error {
 			X float32
 			Y float32
 		}{g.timer * dt, float32(g.v.Norm(2))})
-		if g.r.AtVec(1) < 0 {
-			g.isRunning = false
-		}
+		// fmt.Println(g.timer, g.v.Norm(2)*g.v.Norm(2)/2+calculations.G_Scl()*g.r.AtVec(1))
+		fmt.Println(g.timer, g.a)
+		fmt.Println(g.timer, g.v)
+		fmt.Println(g.timer, g.r)
 		g.timer += 1
 	}
 
@@ -100,7 +111,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Рисуем кнопку "Добавить точку"
 	buttonX, buttonY, buttonW, buttonH := screenWidth-120, 20, 100, 30
 	ebitenutil.DrawRect(screen, float64(buttonX), float64(buttonY), float64(buttonW), float64(buttonH), color.RGBA{0, 0, 255, 255})
-	ebitenutil.DebugPrintAt(screen, "Добавить", buttonX+20, buttonY+10)
+	ebitenutil.DebugPrintAt(screen, "Start", buttonX+20, buttonY+10)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
